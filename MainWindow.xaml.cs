@@ -16,8 +16,7 @@ namespace WpfWindowTest
             ResizeMode = ResizeMode.CanResize; // Needed for WindowChrome to work (AeroSnap then works too)
 
             WindowChrome.SetWindowChrome(this, CreateChrome());
-
-            //BarTitle.MouseLeftButtonDown += (s, a) => DragMove();
+            Loaded += SnapLayoutButton_Loaded;
         }
 
         private static WindowChrome CreateChrome()
@@ -25,7 +24,7 @@ namespace WpfWindowTest
             return new WindowChrome()
             {
                 CaptionHeight = 20,
-                ResizeBorderThickness = SystemParameters.WindowResizeBorderThickness,
+                //ResizeBorderThickness = SystemParameters.WindowResizeBorderThickness,
                 GlassFrameThickness = new Thickness(0),
                 CornerRadius = new CornerRadius(0),
                 UseAeroCaptionButtons = false
