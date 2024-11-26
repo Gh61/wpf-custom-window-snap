@@ -9,7 +9,7 @@ This project features code that enables this features, when using `WindowStyle.N
     - this is done using the `WindowChrome` feature (available from .NET Framework 4.5)
     - also, when using the `WindowChrome` object, you don't need to use `DragMove()` and handle resizing by yourself anymore - it's all there
 - using Windows Snap preview feature (Windows 11+)
-    - this is done by identifying Maximize button in NCHITTEST (0x0084) message as HTMAXBUTTON
+    - this is done by identifying Maximize button in `NCHITTEST (0x0084)` message as `HTMAXBUTTON`
     - see file `MainWindow.MaximizeSnap.cs`
     - this code also features fix for maximize button effects not being triggered (hover and press) by explicitly setting internal dependency properties
 - the Maximize feature of `WindowsStyle.None` requires fixing window size and position
