@@ -13,7 +13,7 @@ namespace WpfWindowTest
             InitializeComponent();
 
             WindowStyle = WindowStyle.None;
-            ResizeMode = ResizeMode.NoResize;
+            ResizeMode = ResizeMode.CanResize; // Needed for WindowChrome to work (AeroSnap then works too)
 
             WindowChrome.SetWindowChrome(this, CreateChrome());
 
