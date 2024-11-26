@@ -13,7 +13,7 @@ This project features code that enables this features, when using `WindowStyle.N
 - using Windows Snap preview feature (Windows 11+)
     - this is done by identifying Maximize button in `NCHITTEST (0x0084)` message as `HTMAXBUTTON`
     - see file `MainWindow.MaximizeSnap.cs`
-    - this code also features fix for maximize button effects not being triggered (hover and press) by explicitly setting internal dependency properties
+    - this code also includes fix for maximize button effects not being triggered (hover and press) by explicitly setting internal dependency properties
 - the Maximize feature of `WindowsStyle.None` requires fixing window size and position
     - this is done by using the code in `MainWindow.Fullscreen.cs`
     - also, there is need to refresh `WindowChrome` and set `ResizeBorderThickness` to zero (disable resizing), as it partially breaks the ability to put the window back "down"
@@ -22,4 +22,6 @@ The code in this repo is mix of various sources:
 - https://learn.microsoft.com/en-us/dotnet/api/system.windows.shell.windowchrome?view=netframework-4.8
 - https://stackoverflow.com/questions/19280016/windowchrome-resizeborderthickness-issue
 - https://stackoverflow.com/questions/69797178/support-windows-11-snap-layout-in-wpf-app
+- https://github.com/dotnet/wpf/issues/4825
+- https://gitlab.com/jplibraries/windowsextensionlibrary/
 - and possibly some other places I've already forgot

@@ -3,22 +3,17 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Interop;
+using Microsoft.Win32;
 
 namespace WpfWindowTest
 {
     public partial class MainWindow
     {
         // WINAPI:
-        private const int WM_NCHITTEST = 0x0084;
-        private const int WM_NCLBUTTONDOWN = 161;
+        private const int WM_NCHITTEST = 0x0084;//InteropValues
+        private const int WM_NCLBUTTONDOWN = 0x00A1;
+        private const int WM_NCLBUTTONUP = 0x00A2;
         private const int HTMAXBUTTON = 9;
-
-        // internal dependency properties
-        private static DependencyPropertyKey s_uiElementIsMouseOverPropertyKey =
-            (DependencyPropertyKey)typeof(UIElement).GetField("IsMouseOverPropertyKey", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static).GetValue(null);
-
-        private static DependencyPropertyKey s_buttonIsPressedPropertyKey =
-            (DependencyPropertyKey)typeof(ButtonBase).GetField("IsPressedPropertyKey", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static).GetValue(null);
 
         private float _scaleFactor;
         private HwndSource _hwndSource;
@@ -30,6 +25,10 @@ namespace WpfWindowTest
         /// </summary>
         private void SnapLayoutButton_Loaded(object sender, RoutedEventArgs e)
         {
+            // This feature is only available on Windows 11+
+            if (!IsWindows11OrGreater())
+                return;
+
             PresentationSource source = PresentationSource.FromVisual(this);
 
             var dpi = 96.0 * source.CompositionTarget.TransformToDevice.M11;
@@ -52,7 +51,7 @@ namespace WpfWindowTest
 
         #endregion
 
-        private bool IsMouseOverFromHook(IntPtr lparam, FrameworkElement button)
+        private bool IsCursorOnButton(IntPtr lparam, FrameworkElement button)
         {
             // Extract mouse coordinates from lparam
             int mouseX = (short)(lparam.ToInt32() & 0xFFFF);
@@ -68,33 +67,76 @@ namespace WpfWindowTest
 
         private IntPtr HwndSourceHook(IntPtr hwnd, int msg, IntPtr wparam, IntPtr lparam, ref bool handled)
         {
-            if (msg == WM_NCLBUTTONDOWN)
+            // Only for WindowsStyle = None
+            if (WindowStyle != WindowStyle.None)
+                return IntPtr.Zero;
+
+            //https://learn.microsoft.com/en-us/windows/apps/desktop/modernize/apply-snap-layout-menu
+            //https://github.com/dotnet/wpf/issues/4825
+            switch (msg)
             {
-                if (IsMouseOverFromHook(lparam, BtnMaximize))
-                {
-                    SetButtonState(BtnMaximize, isPressed: true);
+                case WM_NCHITTEST:
+                    if (IsCursorOnButton(lparam, BtnMaximize))
+                    {
+                        SetButtonState(BtnMaximize, isMouseOver: true);
 
-                    BtnMaximize.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-                }
-            }
+                        handled = true;
 
-            if (msg == WM_NCHITTEST)
-            {
-                if (IsMouseOverFromHook(lparam, BtnMaximize))
-                {
-                    SetButtonState(BtnMaximize, isMouseOver: true);
+                        return new IntPtr(HTMAXBUTTON);
+                    }
+                    else
+                    {
+                        SetButtonState(BtnMaximize, isMouseOver: false, isPressed: false);
+                    }
+                    break;
 
-                    handled = true;
+                case WM_NCLBUTTONDOWN:
+                    if (IsCursorOnButton(lparam, BtnMaximize))
+                    {
+                        SetButtonState(BtnMaximize, isPressed: true);
 
-                    return new IntPtr(HTMAXBUTTON);
-                }
-                else
-                {
-                    SetButtonState(BtnMaximize, isMouseOver: false, isPressed: false);
-                }
+                        handled = true;
+                    }
+                    break;
+
+                case WM_NCLBUTTONUP:
+                    if (IsCursorOnButton(lparam, BtnMaximize))
+                    {
+                        GetButtonState(BtnMaximize, out _, out var wasPressed);
+
+                        SetButtonState(BtnMaximize, isPressed: false);
+
+                        handled = true;
+
+                        if (wasPressed == true)
+                        {
+                            // Fire click
+                            BtnMaximize.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                        }
+                    }
+                    break;
             }
 
             return IntPtr.Zero;
+        }
+
+        #region Helpers
+
+        // internal dependency properties
+        private static DependencyPropertyKey s_uiElementIsMouseOverPropertyKey =
+            (DependencyPropertyKey)typeof(UIElement).GetField("IsMouseOverPropertyKey", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static).GetValue(null);
+
+        private static DependencyPropertyKey s_buttonIsPressedPropertyKey =
+            (DependencyPropertyKey)typeof(ButtonBase).GetField("IsPressedPropertyKey", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static).GetValue(null);
+
+        private static void GetButtonState(UIElement button, out bool isMouseOver, out bool? isPressed)
+        {
+            isMouseOver = (bool)button.GetValue(s_uiElementIsMouseOverPropertyKey.DependencyProperty);
+            isPressed = null;
+            if (button is ButtonBase)
+            {
+                isPressed = (bool)button.GetValue(s_buttonIsPressedPropertyKey.DependencyProperty);
+            }
         }
 
         private static void SetButtonState(UIElement button, bool? isMouseOver = null, bool? isPressed = null)
@@ -109,5 +151,13 @@ namespace WpfWindowTest
                 button.SetValue(s_buttonIsPressedPropertyKey, isPressed.Value);
             }
         }
+
+        private static bool IsWindows11OrGreater()
+        {
+            uint.TryParse(Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "CurrentBuildNumber", "").ToString(), out uint number);
+            return number >= 22000; // Windows 11 Original release (21H2)
+        }
+
+        #endregion
     }
 }
