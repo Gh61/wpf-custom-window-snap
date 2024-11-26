@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Shell;
 
 namespace WpfWindowTest
 {
@@ -14,7 +15,21 @@ namespace WpfWindowTest
             WindowStyle = WindowStyle.None;
             ResizeMode = ResizeMode.NoResize;
 
-            BarTitle.MouseLeftButtonDown += (s, a) => DragMove();
+            WindowChrome.SetWindowChrome(this, CreateChrome());
+
+            //BarTitle.MouseLeftButtonDown += (s, a) => DragMove();
+        }
+
+        private static WindowChrome CreateChrome()
+        {
+            return new WindowChrome()
+            {
+                CaptionHeight = 20,
+                ResizeBorderThickness = SystemParameters.WindowResizeBorderThickness,
+                GlassFrameThickness = new Thickness(0),
+                CornerRadius = new CornerRadius(0),
+                UseAeroCaptionButtons = false
+            };
         }
 
         private void BtnMinimize_OnClick(object sender, RoutedEventArgs e)

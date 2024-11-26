@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:WpfWindowTest"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+
     <Border BorderThickness="1" BorderBrush="Orange">
         <Grid>
             <Grid.RowDefinitions>
@@ -23,10 +24,10 @@
                 <TextBlock Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=Title}" Padding="4"/>
             </Border>
 
-            <Button Grid.Row="0" Grid.Column="1" x:Name="BtnMinimize" Click="BtnMinimize_OnClick">_</Button>
-            <Button Grid.Row="0" Grid.Column="2" x:Name="BtnMaximize" Click="BtnMaximize_OnClick">O</Button>
+            <Button Grid.Row="0" Grid.Column="1" x:Name="BtnMinimize" Click="BtnMinimize_OnClick" WindowChrome.IsHitTestVisibleInChrome="True">_</Button>
+            <Button Grid.Row="0" Grid.Column="2" x:Name="BtnMaximize" Click="BtnMaximize_OnClick" WindowChrome.IsHitTestVisibleInChrome="True">O</Button>
 
-            <Button Grid.Row="0" Grid.Column="3" x:Name="BtnClose" Click="BtnClose_OnClick">X</Button>
+            <Button Grid.Row="0" Grid.Column="3" x:Name="BtnClose" Click="BtnClose_OnClick" WindowChrome.IsHitTestVisibleInChrome="True">X</Button>
         </Grid>
     </Border>
 </Window>
