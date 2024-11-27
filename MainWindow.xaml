@@ -29,6 +29,11 @@
 
             <Button Grid.Row="0" Grid.Column="3" x:Name="BtnClose" Click="BtnClose_OnClick" WindowChrome.IsHitTestVisibleInChrome="True">X</Button>
 
+            <!-- ContentPresenter -->
+            <ContentControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4">
+                <local:MainView/>
+            </ContentControl>
+
             <!-- Corner Resize Grips - are bigger than ResizeBorderThickness -->
             <Border Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="8" Height="8" Background="Red" WindowChrome.ResizeGripDirection="TopLeft"/>
             <Border Grid.Row="0" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Top" Width="8" Height="8" Background="Red" WindowChrome.ResizeGripDirection="TopRight"/>
