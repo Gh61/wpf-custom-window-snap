@@ -5,6 +5,11 @@ using System.Windows.Interop;
 
 namespace WpfWindowTest
 {
+    /*
+     * This part of the code makes sure that the window expands correctly if it goes into fully maximized (Fullscreen) mode.
+     * Without these modifications, the position of the upper left corner is negative (something like [-2;-2]) and the window is stretched below the taskbar (bottom bar of windows).
+     */
+
     public partial class MainWindow
     {
         protected override void OnSourceInitialized(EventArgs e)

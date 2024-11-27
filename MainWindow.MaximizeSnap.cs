@@ -7,6 +7,10 @@ using Microsoft.Win32;
 
 namespace WpfWindowTest
 {
+    /*
+     * This part of code provides the Windows 11 snap menu, when hovering maximize button.
+     */
+
     public partial class MainWindow
     {
         // WINAPI:
