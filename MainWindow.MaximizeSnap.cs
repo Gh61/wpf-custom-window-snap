@@ -154,6 +154,30 @@ namespace WpfWindowTest
             {
                 button.SetValue(s_buttonIsPressedPropertyKey, isPressed.Value);
             }
+
+            if (button is FrameworkElement element)
+            {
+                // refresh actual states
+                GetButtonState(button, out var mouseOver, out isPressed);
+                isMouseOver = mouseOver;
+
+                string state;
+                if (isPressed == true)
+                {
+                    state = "Pressed";
+                }
+                else if (isMouseOver == true)
+                {
+                    state = "MouseOver";
+                }
+                else
+                {
+                    state = "Normal";
+                }
+
+                // apply visual state (for styling to work)
+                VisualStateManager.GoToState(element, state, true);
+            }
         }
 
         private static bool IsWindows11OrGreater()
