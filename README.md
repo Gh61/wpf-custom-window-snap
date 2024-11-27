@@ -5,7 +5,7 @@ If you don't want to manage all this features/issues by yourself, I recommend us
 I've created this project as test for implementing these features to our legacy application, where I cannot simply change base classes and use any other library.
 
 ![snap-preview](https://github.com/user-attachments/assets/be5a75d1-48fc-4844-91da-fed239cbef6d)
-*NOTE: In Debug build the resize can be a bit flickery, but in Release build everything is smooth*
+*NOTE: While the Debuger is attached, the resize can be a bit flickery. When the debugger is detached everything is smooth*
 
 This project features code that enables this features, when using `WindowStyle.None`:
 - using Windows Snap feature (automatically snap window to all sides of screen or maximizing/restoring the window)
