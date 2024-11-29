@@ -18,7 +18,28 @@ namespace WpfWindowTest
             ((HwndSource)PresentationSource.FromVisual(this)).AddHook(HookProc);
         }
 
-        private static IntPtr HookProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        /// <summary>
+        /// This needs to be called in OnStateChanged - for fullscreen size to correctly work.
+        /// </summary>
+        private void RefreshMaxHeight()
+        {
+            if (WindowState == WindowState.Maximized)
+            {
+                // se the MaxHeight to the size of WorkingArea, where the window is
+                var windowHandle = new WindowInteropHelper(this).Handle;
+                var screen = System.Windows.Forms.Screen.FromHandle(windowHandle);
+
+                // FullScreen is then limited by this and will not go behind the taskbar
+                this.MaxHeight = screen.WorkingArea.Height;
+            }
+            else
+            {
+                // reset MaxHeight
+                this.MaxHeight = double.PositiveInfinity;
+            }
+        }
+
+        private IntPtr HookProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             if (msg == WM_GETMINMAXINFO)
             {

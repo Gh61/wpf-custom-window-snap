@@ -57,6 +57,8 @@ namespace WpfWindowTest
         {
             base.OnStateChanged(e);
 
+            RefreshMaxHeight();
+
             WindowChrome.SetWindowChrome(this, CreateChrome(WindowState == WindowState.Maximized));
         }
     }
