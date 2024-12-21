@@ -61,7 +61,7 @@ namespace WpfWindowTest
                     RECT rcWorkArea = monitorInfo.rcWork;
                     RECT rcMonitorArea = monitorInfo.rcMonitor;
 
-                    // this will can be outside the working area
+                    // this can be outside the working area
                     var originalX = mmi.ptMaxPosition.X;// eg. -6
                     var originalY = mmi.ptMaxPosition.Y;// eg. -6
 
