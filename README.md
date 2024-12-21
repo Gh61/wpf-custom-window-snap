@@ -25,4 +25,5 @@ The code in this repo is mix of various sources:
 - https://stackoverflow.com/questions/69797178/support-windows-11-snap-layout-in-wpf-app
 - https://github.com/dotnet/wpf/issues/4825
 - https://gitlab.com/jplibraries/windowsextensionlibrary/
+- https://stackoverflow.com/questions/70976583/get-real-screen-resolution-using-win32-api - DPI per monitor handling
 - and possibly some other places I've already forgot

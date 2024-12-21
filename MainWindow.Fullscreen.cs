@@ -30,7 +30,7 @@ namespace WpfWindowTest
                 var screen = System.Windows.Forms.Screen.FromHandle(windowHandle);
 
                 // FullScreen is then limited by this and will not go behind the taskbar
-                this.MaxHeight = screen.WorkingArea.Height;
+                this.MaxHeight = screen.WorkingArea.Height / _lastScaleY;
             }
             else
             {
@@ -38,6 +38,8 @@ namespace WpfWindowTest
                 this.MaxHeight = double.PositiveInfinity;
             }
         }
+
+        private double _lastScaleY;
 
         private IntPtr HookProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
@@ -52,15 +54,25 @@ namespace WpfWindowTest
 
                 if (monitor != IntPtr.Zero)
                 {
-                    MONITORINFO monitorInfo = new MONITORINFO();
-                    monitorInfo.cbSize = Marshal.SizeOf(typeof(MONITORINFO));
+                    MONITORINFOEX monitorInfo = new MONITORINFOEX();
+                    monitorInfo.cbSize = Marshal.SizeOf(typeof(MONITORINFOEX));
                     GetMonitorInfo(monitor, ref monitorInfo);
+
+                    DEVMODE devMode = new DEVMODE();
+                    devMode.dmSize = (ushort)Marshal.SizeOf(typeof(DEVMODE));
+                    EnumDisplaySettings(monitorInfo.szDevice, -1 /*currentSettings*/, ref devMode);
+
                     RECT rcWorkArea = monitorInfo.rcWork;
                     RECT rcMonitorArea = monitorInfo.rcMonitor;
-                    mmi.ptMaxPosition.X = Math.Abs(rcWorkArea.Left - rcMonitorArea.Left);
-                    mmi.ptMaxPosition.Y = Math.Abs(rcWorkArea.Top - rcMonitorArea.Top);
-                    mmi.ptMaxSize.X = Math.Abs(rcWorkArea.Right - rcWorkArea.Left);
-                    mmi.ptMaxSize.Y = Math.Abs(rcWorkArea.Bottom - rcWorkArea.Top);
+
+                    var scaleX = Math.Abs((rcMonitorArea.Right - rcMonitorArea.Left) / (double)devMode.dmPelsWidth);
+                    var scaleY = Math.Abs((rcMonitorArea.Top - rcMonitorArea.Bottom) / (double)devMode.dmPelsHeight);
+                    _lastScaleY = scaleY;
+
+                    mmi.ptMaxPosition.X = (int)(Math.Abs(rcWorkArea.Left - rcMonitorArea.Left) / scaleX);
+                    mmi.ptMaxPosition.Y = (int)(Math.Abs(rcWorkArea.Top - rcMonitorArea.Top) / scaleY);
+                    mmi.ptMaxSize.X = (int)(Math.Abs(rcWorkArea.Right - rcWorkArea.Left) / scaleX);
+                    mmi.ptMaxSize.Y = (int)(Math.Abs(rcWorkArea.Bottom - rcWorkArea.Top) / scaleY);
                 }
 
                 Marshal.StructureToPtr(mmi, lParam, true);
@@ -76,8 +88,11 @@ namespace WpfWindowTest
         [DllImport("user32.dll")]
         private static extern IntPtr MonitorFromWindow(IntPtr handle, uint flags);
 
-        [DllImport("user32.dll")]
-        private static extern bool GetMonitorInfo(IntPtr hMonitor, ref MONITORINFO lpmi);
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        private static extern bool GetMonitorInfo(IntPtr hmonitor, ref MONITORINFOEX info);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        private static extern bool EnumDisplaySettings(char[] deviceName, int modeNum, ref DEVMODE devMode);
 
         [Serializable]
         [StructLayout(LayoutKind.Sequential)]
@@ -97,13 +112,55 @@ namespace WpfWindowTest
             }
         }
 
-        [StructLayout(LayoutKind.Sequential)]
-        public struct MONITORINFO
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto, Pack=4)]
+        public struct MONITORINFOEX
         {
             public int cbSize;
             public RECT rcMonitor;
             public RECT rcWork;
-            public uint dwFlags;
+            public int dwFlags;
+
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+            public char[] szDevice;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Auto)]
+        public struct DEVMODE
+        {
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+            public string dmDeviceName;
+            public ushort dmSpecVersion;
+            public ushort dmDriverVersion;
+            public ushort dmSize;
+            public ushort dmDriverExtra;
+            public uint dmFields;
+
+            public int dmPositionX;
+            public int dmPositionY;
+            public int dmDisplayOrientation;
+            public int dmDisplayFixedOutput;
+
+            public short dmColor;
+            public short dmDuplex;
+            public short dmYResolution;
+            public short dmTTOption;
+            public short dmCollate;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+            public string dmFormName;
+            public short dmLogPixels;
+            public int dmBitsPerPel;
+            public int dmPelsWidth;
+            public int dmPelsHeight;
+            public int dmDisplayFlags;
+            public int dmDisplayFrequency;
+            public int dmICMMethod;
+            public int dmICMIntent;
+            public int dmMediaType;
+            public int dmDitherType;
+            public int dmReserved1;
+            public int dmReserved2;
+            public int dmPanningWidth;
+            public int dmPanningHeight;
         }
 
         [Serializable]
