@@ -65,8 +65,8 @@ namespace WpfWindowTest
                     RECT rcWorkArea = monitorInfo.rcWork;
                     RECT rcMonitorArea = monitorInfo.rcMonitor;
 
-                    var scaleX = Math.Abs((rcMonitorArea.Right - rcMonitorArea.Left) / (double)devMode.dmPelsWidth);
-                    var scaleY = Math.Abs((rcMonitorArea.Top - rcMonitorArea.Bottom) / (double)devMode.dmPelsHeight);
+                    var scaleX = Math.Abs((rcMonitorArea.Right - rcMonitorArea.Left) / (float)devMode.dmPelsWidth);
+                    var scaleY = Math.Abs((rcMonitorArea.Top - rcMonitorArea.Bottom) / (float)devMode.dmPelsHeight);
                     _lastScaleY = scaleY;
 
                     mmi.ptMaxPosition.X = (int)(Math.Abs(rcWorkArea.Left - rcMonitorArea.Left) / scaleX);
