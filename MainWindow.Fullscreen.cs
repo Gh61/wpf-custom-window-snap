@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
@@ -30,8 +31,11 @@ namespace WpfWindowTest
                 var screen = System.Windows.Forms.Screen.FromHandle(windowHandle);
 
                 // FullScreen is then limited by this and will not go behind the taskbar
-                this.MaxHeight = screen.WorkingArea.Height;
-                this.MaxWidth = screen.WorkingArea.Width;
+                using (var g = Graphics.FromHwnd(windowHandle))
+                {
+                    this.MaxHeight = screen.WorkingArea.Height / (g.DpiY / 96.0f);
+                    this.MaxWidth = screen.WorkingArea.Width / (g.DpiX / 96.0f);
+                }
             }
             else
             {
